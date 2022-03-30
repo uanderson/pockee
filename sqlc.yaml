@@ -1,0 +1,17 @@
+version: 1
+packages:
+  - name: "dao"
+    path: "exchange/dao"
+    engine: "postgresql"
+    emit_empty_slices: true
+    output_db_file_name: "dao.go"
+    output_models_file_name: "models.go"
+    output_querier_file_name: "querier.go"
+    schema: "./.sqlc/exchange/schema.sql"
+    queries: "./.sqlc/exchange/queries.sql"
+    sql_package: "pgx/v4"
+    emit_interface: true
+    emit_prepared_queries: true
+
+rename:
+  id: "Id"

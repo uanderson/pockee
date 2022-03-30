@@ -1,19 +1,24 @@
 package main
 
 import (
+	"github.com/gorilla/mux"
+	"github.com/uanderson/pockee/database"
+	"github.com/uanderson/pockee/exchange"
 	"log"
 	"net/http"
 	"os"
 	"time"
-
-	"github.com/gorilla/mux"
 )
+
+func schedule() {
+	exchange.Schedule()
+}
 
 func handle() *mux.Router {
 	return mux.NewRouter()
 }
 
-func main() {
+func serve() {
 	address := os.Getenv("ADDRESS")
 
 	if len(address) == 0 {
@@ -28,9 +33,15 @@ func main() {
 		Handler:      handle(),
 	}
 
-	log.Printf("Server running: %s\n", server.Addr)
+	log.Printf("server running: %v\n", server.Addr)
 
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func main() {
+	database.Init()
+	schedule()
+	serve()
 }

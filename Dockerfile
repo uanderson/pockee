@@ -25,12 +25,12 @@ COPY --from=build /go/bin/app /go/bin/app
 RUN apk --update --no-cache add \
     bash \
     curl \
-    openjdk17-jre-headless \
     postgresql-client
 
-RUN curl -L https://github.com/liquibase/liquibase/releases/download/v4.8.0/liquibase-4.8.0.zip -o liquibase.zip \
-  && unzip liquibase.zip -d /usr/local/bin/liquibase \
-  && rm -f liquibase.zip
+RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz -o migrate.tar.gz \
+  && mkdir -p /usr/local/bin/migrate \
+  && tar -zxf migrate.tar.gz --directory /usr/local/bin/migrate \
+  && rm -f migrate.tar.gz
 
 RUN chmod +x /app/Dockerrun
 

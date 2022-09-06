@@ -1,7 +1,4 @@
---liquibase formatted sql
-
---changeset uanderson:1
-CREATE TABLE exchange_rates
+CREATE TABLE IF NOT EXISTS exchange_rates
 (
   id     CHAR(20) NOT NULL PRIMARY KEY,
   date   DATE NOT NULL,

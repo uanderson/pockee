@@ -89,7 +89,7 @@ func Schedule() Scheduler {
 	}
 
 	cron := cron.New()
-	cron.AddFunc("0 * * * *", scheduler.fetchExchangeRates)
+	cron.AddFunc("0 20-23 * * 1-5", scheduler.fetchExchangeRates)
 	cron.Start()
 
 	return scheduler

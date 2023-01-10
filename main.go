@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/uanderson/pockee/database"
 	"github.com/uanderson/pockee/exchange"
+	"github.com/uanderson/pockee/pocketsmith"
 	"log"
 	"net/http"
 	"os"
@@ -12,6 +13,7 @@ import (
 
 func schedule() {
 	exchange.Schedule()
+	pocketsmith.Schedule()
 }
 
 func handle() *mux.Router {

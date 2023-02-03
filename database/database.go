@@ -20,12 +20,11 @@ func Init() {
 		os.Getenv("DATABASE_NAME"))
 
 	pool, err := pgxpool.Connect(context.Background(), url)
-
 	if err != nil {
 		log.Fatalf("Error initializing database: %v\n", err)
 	}
 
-	log.Printf("connected to %s database", os.Getenv("DATABASE_NAME"))
+	log.Printf("Connected to '%s' database", os.Getenv("DATABASE_NAME"))
 
 	Pool = pool
 }

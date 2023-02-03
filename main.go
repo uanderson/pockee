@@ -1,49 +1,35 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
+	"github.com/labstack/echo/v4"
 	"github.com/uanderson/pockee/database"
 	"github.com/uanderson/pockee/exchange"
+	"github.com/uanderson/pockee/firebase"
 	"github.com/uanderson/pockee/pocketsmith"
-	"log"
 	"net/http"
 	"os"
-	"time"
 )
+
+func main() {
+	firebase.Init()
+	database.Init()
+
+	schedule()
+	serve()
+}
 
 func schedule() {
 	exchange.Schedule()
 	pocketsmith.Schedule()
 }
 
-func handle() *mux.Router {
-	return mux.NewRouter()
-}
-
 func serve() {
+	e := echo.New()
+
+	e.GET("/status", func(c echo.Context) error {
+		return c.String(http.StatusOK, "OK")
+	})
+
 	address := os.Getenv("ADDRESS")
-
-	if len(address) == 0 {
-		address = ":8000"
-	}
-
-	server := &http.Server{
-		Addr:         address,
-		WriteTimeout: time.Second * 15,
-		ReadTimeout:  time.Second * 15,
-		IdleTimeout:  time.Second * 60,
-		Handler:      handle(),
-	}
-
-	log.Printf("server running: %v\n", server.Addr)
-
-	if err := server.ListenAndServe(); err != nil {
-		log.Fatal(err)
-	}
-}
-
-func main() {
-	database.Init()
-	schedule()
-	serve()
+	e.Logger.Fatal(e.Start(address))
 }

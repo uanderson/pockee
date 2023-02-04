@@ -84,9 +84,9 @@ func (s *Scheduler) updateEvent(event Event) {
 	}
 
 	exchangeRate, err := s.exchangeDao.GetExchangeRateForConversion(context.TODO(), exchangedao.GetExchangeRateForConversionParams{
-		Date:   time.Now(),
-		Source: eventMetaData.Currency,
-		Target: strings.ToUpper(event.CurrencyCode),
+		CreatedAt: time.Now(),
+		Source:    eventMetaData.Currency,
+		Target:    strings.ToUpper(event.CurrencyCode),
 	})
 
 	if err != nil {

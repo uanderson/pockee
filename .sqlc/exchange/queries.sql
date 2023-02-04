@@ -1,18 +1,15 @@
--- name: GetExchangeRate :one
-SELECT *
-FROM exchange_rates
-WHERE date = now():: date;
-
 -- name: GetExchangeRateForConversion :one
 SELECT *
-FROM exchange_rates
-WHERE date = @date
-  AND source = @source
-  AND target = @target;
+  FROM exchange_rates
+ WHERE created_at::date = @created_at::date
+   AND source = @source
+   AND target = @target
+ ORDER BY created_at DESC
+ LIMIT 1;
 
--- name: UpdateExchangeRate :exec
-INSERT
-INTO exchange_rates (id, date, source, target, rate)
-VALUES (@id, @date, @source, @target, @rate)
-ON CONFLICT (date, source, target) DO
-UPDATE SET rate = @rate;
+-- name: CreateExchangeRate :exec
+INSERT INTO exchange_rates (id, date, source, target, rate, created_at)
+VALUES (@id, @date, @source, @target, @rate, @created_at);
+
+-- name: GetExchangeCurrencies :many
+SELECT * FROM exchange_currencies;

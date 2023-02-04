@@ -10,75 +10,82 @@ import (
 	"time"
 )
 
-const getExchangeRate = `-- name: GetExchangeRate :one
-SELECT id, date, source, target, rate
-FROM exchange_rates
-WHERE date = now():: date
+const createExchangeRate = `-- name: CreateExchangeRate :exec
+INSERT INTO exchange_rates (id, date, source, target, rate, created_at)
+VALUES ($1, $2, $3, $4, $5, $6)
 `
 
-func (q *Queries) GetExchangeRate(ctx context.Context) (ExchangeRate, error) {
-	row := q.db.QueryRow(ctx, getExchangeRate)
-	var i ExchangeRate
-	err := row.Scan(
-		&i.Id,
-		&i.Date,
-		&i.Source,
-		&i.Target,
-		&i.Rate,
-	)
-	return i, err
+type CreateExchangeRateParams struct {
+	Id        string
+	Date      time.Time
+	Source    string
+	Target    string
+	Rate      float64
+	CreatedAt time.Time
 }
 
-const getExchangeRateForConversion = `-- name: GetExchangeRateForConversion :one
-SELECT id, date, source, target, rate
-FROM exchange_rates
-WHERE date = $1
-  AND source = $2
-  AND target = $3
-`
-
-type GetExchangeRateForConversionParams struct {
-	Date   time.Time
-	Source string
-	Target string
-}
-
-func (q *Queries) GetExchangeRateForConversion(ctx context.Context, arg GetExchangeRateForConversionParams) (ExchangeRate, error) {
-	row := q.db.QueryRow(ctx, getExchangeRateForConversion, arg.Date, arg.Source, arg.Target)
-	var i ExchangeRate
-	err := row.Scan(
-		&i.Id,
-		&i.Date,
-		&i.Source,
-		&i.Target,
-		&i.Rate,
-	)
-	return i, err
-}
-
-const updateExchangeRate = `-- name: UpdateExchangeRate :exec
-INSERT
-INTO exchange_rates (id, date, source, target, rate)
-VALUES ($1, $2, $3, $4, $5)
-ON CONFLICT (date, source, target) DO
-UPDATE SET rate = $5
-`
-
-type UpdateExchangeRateParams struct {
-	Id     string
-	Date   time.Time
-	Source string
-	Target string
-	Rate   float64
-}
-
-func (q *Queries) UpdateExchangeRate(ctx context.Context, arg UpdateExchangeRateParams) error {
-	_, err := q.db.Exec(ctx, updateExchangeRate,
+func (q *Queries) CreateExchangeRate(ctx context.Context, arg CreateExchangeRateParams) error {
+	_, err := q.db.Exec(ctx, createExchangeRate,
 		arg.Id,
 		arg.Date,
 		arg.Source,
 		arg.Target,
 		arg.Rate,
+		arg.CreatedAt,
 	)
 	return err
+}
+
+const getExchangeCurrencies = `-- name: GetExchangeCurrencies :many
+SELECT id, source, target FROM exchange_currencies
+`
+
+func (q *Queries) GetExchangeCurrencies(ctx context.Context) ([]ExchangeCurrency, error) {
+	rows, err := q.db.Query(ctx, getExchangeCurrencies)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ExchangeCurrency{}
+	for rows.Next() {
+		var i ExchangeCurrency
+		if err := rows.Scan(&i.Id, &i.Source, &i.Target); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getExchangeRateForConversion = `-- name: GetExchangeRateForConversion :one
+SELECT id, date, source, target, rate, created_at
+  FROM exchange_rates
+ WHERE created_at::date = $1::date
+   AND source = $2
+   AND target = $3
+ ORDER BY created_at DESC
+ LIMIT 1
+`
+
+type GetExchangeRateForConversionParams struct {
+	CreatedAt time.Time
+	Source    string
+	Target    string
+}
+
+func (q *Queries) GetExchangeRateForConversion(ctx context.Context, arg GetExchangeRateForConversionParams) (ExchangeRate, error) {
+	row := q.db.QueryRow(ctx, getExchangeRateForConversion, arg.CreatedAt, arg.Source, arg.Target)
+	var i ExchangeRate
+	err := row.Scan(
+		&i.Id,
+		&i.Date,
+		&i.Source,
+		&i.Target,
+		&i.Rate,
+		&i.CreatedAt,
+	)
+	return i, err
 }

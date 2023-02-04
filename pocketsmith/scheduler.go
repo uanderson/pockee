@@ -16,7 +16,7 @@ func Schedule() Scheduler {
 	}
 
 	cron := cron.New()
-	cron.AddFunc("0 17-20 * * 1-5", scheduler.fetchEvents)
+	cron.AddFunc("30 * * * *", scheduler.fetchEvents)
 	cron.Start()
 
 	return scheduler

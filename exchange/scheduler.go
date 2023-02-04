@@ -2,81 +2,24 @@ package exchange
 
 import (
 	"context"
-	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
 	"github.com/gojek/heimdall/v7/httpclient"
 	"github.com/robfig/cron/v3"
 	"github.com/uanderson/pockee/autoid"
 	"github.com/uanderson/pockee/database"
 	"github.com/uanderson/pockee/exchange/dao"
-	"io/ioutil"
 	"log"
-	"net/url"
+	"net/http"
 	"os"
-	"strings"
+	"strconv"
 	"time"
 )
-
-// Values are temporary fixed here
-var exchanges = []string{"USD_BRL", "EUR_BRL"}
 
 type Scheduler struct {
 	dao        *dao.Queries
 	httpClient *httpclient.Client
-}
-
-func (s *Scheduler) fetchExchangeRates() {
-	apiKey := os.Getenv("EXCHANGE_API_KEY")
-	apiUri := os.Getenv("EXCHANGE_API_URI")
-
-	params := url.Values{
-		"q":       {strings.Join(exchanges[:], ",")},
-		"compact": {"ultra"},
-		"apiKey":  {apiKey},
-	}
-
-	apiUri = fmt.Sprintf("%s?%s", apiUri, params.Encode())
-
-	response, err := s.httpClient.Get(apiUri, nil)
-	if err != nil {
-		log.Printf("could not fetch the exchange rates: %v\n", err)
-		return
-	}
-
-	body, err := ioutil.ReadAll(response.Body)
-
-	defer response.Body.Close()
-
-	var rates map[string]interface{}
-	err = json.Unmarshal(body, &rates)
-	if err != nil {
-		log.Println("could not parse exchange rates response")
-		return
-	}
-
-	for _, exchange := range exchanges {
-		if _, ok := rates[exchange]; ok {
-			split := strings.Split(exchange, "_")
-			rate := rates[exchange].(float64)
-
-			s.updateExchangeRate(split[0], split[1], rate)
-		}
-	}
-}
-
-func (s *Scheduler) updateExchangeRate(source string, target string, rate float64) {
-	err := s.dao.UpdateExchangeRate(context.TODO(), dao.UpdateExchangeRateParams{
-		Date:   time.Now(),
-		Id:     autoid.Id(),
-		Rate:   rate,
-		Source: source,
-		Target: target,
-	})
-
-	if err != nil {
-		log.Printf("exchange rate %s > %s update failed: %v\n", source, target, err)
-		return
-	}
 }
 
 func Schedule() Scheduler {
@@ -89,8 +32,78 @@ func Schedule() Scheduler {
 	}
 
 	cron := cron.New()
-	cron.AddFunc("0 20-23 * * 1-5", scheduler.fetchExchangeRates)
+	cron.AddFunc("0 * * * *", scheduler.fetchExchangeRates)
 	cron.Start()
 
 	return scheduler
+}
+
+func (s *Scheduler) fetchExchangeRates() {
+	ctx := context.Background()
+
+	currencies, err := s.dao.GetExchangeCurrencies(ctx)
+	if err != nil {
+		return
+	}
+
+	for _, currency := range currencies {
+		err, rate := fetchExchangeRate(currency)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		s.updateExchangeRate(currency.Source, currency.Target, rate)
+	}
+}
+
+func fetchExchangeRate(currency dao.ExchangeCurrency) (error, float64) {
+	googleUrl := os.Getenv("GOOGLE_FINANCE_URL")
+	url := fmt.Sprintf("%s/%s-%s", googleUrl, currency.Source, currency.Target)
+
+	res, err := http.Get(url)
+	if err != nil {
+		return err, 0
+	}
+
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		return fmt.Errorf("failed to fetch from Google Finance: %d %s", res.StatusCode, res.Status), 0
+	}
+
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+	if err != nil {
+		return err, 0
+	}
+
+	lastPriceEl := doc.Find("[data-last-price]").First()
+	lastPrice, exists := lastPriceEl.Attr("data-last-price")
+
+	if !exists {
+		return errors.New("could not find last price attribute"), 0
+	}
+
+	convertedRate, err := strconv.ParseFloat(lastPrice, 64)
+	if err != nil {
+		return err, 0
+	}
+
+	return nil, convertedRate
+}
+
+func (s *Scheduler) updateExchangeRate(source string, target string, rate float64) {
+	err := s.dao.CreateExchangeRate(context.Background(), dao.CreateExchangeRateParams{
+		Date:      time.Now(),
+		Id:        autoid.Id(),
+		Rate:      rate,
+		Source:    source,
+		Target:    target,
+		CreatedAt: time.Now(),
+	})
+
+	if err != nil {
+		log.Printf("exchange rate %s > %s update failed: %v\n", source, target, err)
+		return
+	}
 }

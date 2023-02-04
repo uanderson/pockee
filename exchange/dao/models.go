@@ -8,10 +8,17 @@ import (
 	"time"
 )
 
-type ExchangeRate struct {
+type ExchangeCurrency struct {
 	Id     string
-	Date   time.Time
 	Source string
 	Target string
-	Rate   float64
+}
+
+type ExchangeRate struct {
+	Id        string
+	Date      time.Time
+	Source    string
+	Target    string
+	Rate      float64
+	CreatedAt time.Time
 }

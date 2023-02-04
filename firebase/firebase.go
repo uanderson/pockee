@@ -16,17 +16,17 @@ var Auth *auth.Client
 func Init() {
 	firebaseApp, err := firebase.NewApp(context.Background(), nil)
 	if err != nil {
-		log.Fatalf("Error initializing Firebase: %v\n", err)
+		log.Fatalf("error initializing Firebase: %v\n", err)
 	}
 
 	firebaseAuth, err := firebaseApp.Auth(context.Background())
 	if err != nil {
-		log.Fatalf("Error initializing Firebase auth: %v\n", err)
+		log.Fatalf("error initializing Firebase auth: %v\n", err)
 	}
 
-	Auth = firebaseAuth
+	log.Println("firebase initialized")
 
-	log.Println("Firebase initialized")
+	Auth = firebaseAuth
 }
 
 func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {

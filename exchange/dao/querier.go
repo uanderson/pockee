@@ -9,9 +9,9 @@ import (
 )
 
 type Querier interface {
-	GetExchangeRate(ctx context.Context) (ExchangeRate, error)
+	CreateExchangeRate(ctx context.Context, arg CreateExchangeRateParams) error
+	GetExchangeCurrencies(ctx context.Context) ([]ExchangeCurrency, error)
 	GetExchangeRateForConversion(ctx context.Context, arg GetExchangeRateForConversionParams) (ExchangeRate, error)
-	UpdateExchangeRate(ctx context.Context, arg UpdateExchangeRateParams) error
 }
 
 var _ Querier = (*Queries)(nil)

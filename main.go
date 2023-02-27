@@ -24,12 +24,12 @@ func schedule() {
 }
 
 func serve() {
-	e := echo.New()
+	elEcho := echo.New()
 
-	e.GET("/status", func(c echo.Context) error {
+	elEcho.GET("/status", func(c echo.Context) error {
 		return c.String(http.StatusOK, "OK")
 	})
 
 	address := os.Getenv("ADDRESS")
-	e.Logger.Fatal(e.Start(address))
+	elEcho.Logger.Fatal(elEcho.Start(address))
 }

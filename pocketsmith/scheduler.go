@@ -4,6 +4,8 @@ import (
 	"github.com/robfig/cron/v3"
 	"github.com/uanderson/pockee/database"
 	exchangedao "github.com/uanderson/pockee/exchange/dao"
+	"github.com/uanderson/pockee/setting"
+	"log"
 )
 
 type Scheduler struct {
@@ -15,8 +17,14 @@ func Schedule() Scheduler {
 		exchangeDao: exchangedao.New(database.Pool),
 	}
 
+	settingService := setting.NewService()
+	cronSetting, err := settingService.GetSettingByKey("pocketsmith.cron")
+	if err != nil {
+		log.Fatal("failed to query 'pocketsmith.cron' setting")
+	}
+
 	cron := cron.New()
-	cron.AddFunc("30 * * * *", scheduler.fetchEvents)
+	cron.AddFunc(cronSetting.Value, scheduler.fetchEvents)
 	cron.Start()
 
 	return scheduler

@@ -10,6 +10,7 @@ import (
 	"github.com/uanderson/pockee/autoid"
 	"github.com/uanderson/pockee/database"
 	"github.com/uanderson/pockee/exchange/dao"
+	"github.com/uanderson/pockee/setting"
 	"log"
 	"net/http"
 	"os"
@@ -31,8 +32,14 @@ func Schedule() Scheduler {
 		),
 	}
 
+	settingService := setting.NewService()
+	cronSetting, err := settingService.GetSettingByKey("exchange.cron")
+	if err != nil {
+		log.Fatal("failed to query 'exchange.cron' setting")
+	}
+
 	cron := cron.New()
-	cron.AddFunc("0 * * * *", scheduler.fetchExchangeRates)
+	cron.AddFunc(cronSetting.Value, scheduler.fetchExchangeRates)
 	cron.Start()
 
 	return scheduler

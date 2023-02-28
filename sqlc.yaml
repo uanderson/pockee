@@ -14,6 +14,19 @@ sql:
         emit_interface: true
         emit_prepared_queries: true
 
+  - schema: "./.sqlc/setting/schema.sql"
+    queries: "./.sqlc/setting/queries.sql"
+    engine: "postgresql"
+    gen:
+      go:
+        package: dao
+        out: "setting/dao"
+        emit_empty_slices: true
+        output_db_file_name: "dao.go"
+        sql_package: "pgx/v4"
+        emit_interface: true
+        emit_prepared_queries: true
+
 overrides:
   go:
     rename:

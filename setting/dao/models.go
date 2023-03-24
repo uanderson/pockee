@@ -11,3 +11,10 @@ type Setting struct {
 	Key   string
 	Value string
 }
+
+type UserSetting struct {
+	Id     string
+	Key    string
+	Value  string
+	UserID string
+}

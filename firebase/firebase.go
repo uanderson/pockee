@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"log"
 	"net/http"
+	"strings"
 )
 
 // Auth client from firebase
@@ -29,20 +30,36 @@ func Init() {
 	Auth = firebaseAuth
 }
 
-func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+func Protect(handlerFunc echo.HandlerFunc, allowedRoles ...string) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		authHeader := c.Request().Header.Get("Authorization")
-		if authHeader == "" {
+		authorization := c.Request().Header.Get("Authorization")
+
+		if authorization == "" {
 			return echo.NewHTTPError(http.StatusUnauthorized, "Missing authorization header")
 		}
 
-		token, err := Auth.VerifyIDToken(context.Background(), authHeader)
+		authorization = strings.Replace(authorization, "Bearer ", "", 1)
+		token, err := Auth.VerifyIDToken(context.Background(), authorization)
+
 		if err != nil {
-			return echo.NewHTTPError(http.StatusUnauthorized, "Invalid authorization token")
+			return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")
 		}
 
 		c.Set("uid", token.UID)
 
-		return next(c)
+		if len(allowedRoles) > 0 && !hasRole(allowedRoles, token) {
+			return echo.NewHTTPError(http.StatusForbidden, "Access denied")
+		}
+
+		return handlerFunc(c)
 	}
+}
+
+func hasRole(allowedRoles []string, token *auth.Token) bool {
+	for _, role := range allowedRoles {
+		if _, exists := token.Claims["roles"].(map[string]interface{})[role]; exists {
+			return true
+		}
+	}
+	return false
 }

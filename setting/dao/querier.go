@@ -10,7 +10,8 @@ import (
 
 type Querier interface {
 	GetSettingByKey(ctx context.Context, key string) (Setting, error)
-	UpdateSetting(ctx context.Context, arg UpdateSettingParams) error
+	GetUserSettingByKey(ctx context.Context, arg GetUserSettingByKeyParams) (UserSetting, error)
+	UpdateUserSetting(ctx context.Context, arg UpdateUserSettingParams) error
 }
 
 var _ Querier = (*Queries)(nil)

@@ -31,3 +31,4 @@ overrides:
   go:
     rename:
       id: "Id"
+      user_id: "UserId"

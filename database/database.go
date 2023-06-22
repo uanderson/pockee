@@ -3,7 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"os"
 )
@@ -19,12 +19,12 @@ func Init() {
 		os.Getenv("DATABASE_HOST"),
 		os.Getenv("DATABASE_NAME"))
 
-	pool, err := pgxpool.Connect(context.Background(), url)
+	pool, err := pgxpool.New(context.Background(), url)
 	if err != nil {
 		log.Fatalf("error initializing database: %v\n", err)
 	}
 
-	Pool = pool
-
 	log.Printf("connected to '%s' database", os.Getenv("DATABASE_NAME"))
+
+	Pool = pool
 }

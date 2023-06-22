@@ -10,7 +10,7 @@ sql:
         out: "exchange/dao"
         emit_empty_slices: true
         output_db_file_name: "dao.go"
-        sql_package: "pgx/v4"
+        sql_package: "pgx/v5"
         emit_interface: true
         emit_prepared_queries: true
 
@@ -23,7 +23,7 @@ sql:
         out: "setting/dao"
         emit_empty_slices: true
         output_db_file_name: "dao.go"
-        sql_package: "pgx/v4"
+        sql_package: "pgx/v5"
         emit_interface: true
         emit_prepared_queries: true
 
@@ -32,3 +32,5 @@ overrides:
     rename:
       id: "Id"
       user_id: "UserId"
+
+

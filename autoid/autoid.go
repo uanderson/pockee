@@ -1,13 +1,13 @@
 package autoid
 
 import (
+	"crypto/rand"
 	"fmt"
-	"math/rand"
 )
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 
-func Id() string {
+func New() string {
 	bytes := make([]byte, 20)
 
 	if _, err := rand.Read(bytes); err != nil {

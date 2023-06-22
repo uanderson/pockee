@@ -3,6 +3,7 @@ package pocketsmith
 import (
 	"context"
 	"fmt"
+	"github.com/jackc/pgx/v5/pgtype"
 	exchangedao "github.com/uanderson/pockee/exchange/dao"
 	"gopkg.in/yaml.v3"
 	"log"
@@ -84,7 +85,7 @@ func (s *Scheduler) updateEvent(event Event) {
 	}
 
 	exchangeRate, err := s.exchangeDao.GetExchangeRateForConversion(context.TODO(), exchangedao.GetExchangeRateForConversionParams{
-		CreatedAt: time.Now(),
+		CreatedAt: pgtype.Date{Time: time.Now(), Valid: true},
 		Source:    eventMetaData.Currency,
 		Target:    strings.ToUpper(event.CurrencyCode),
 	})

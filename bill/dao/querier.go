@@ -6,10 +6,12 @@ package dao
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Querier interface {
-	GetContacts(ctx context.Context) (Contact, error)
+	GetRecurringBillsByRange(ctx context.Context, date pgtype.Date) ([]RecurringBill, error)
 }
 
 var _ Querier = (*Queries)(nil)

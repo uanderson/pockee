@@ -1,6 +1,45 @@
 version: 2
 
 sql:
+  - schema: "./.sqlc/account/schema.sql"
+    queries: "./.sqlc/account/queries.sql"
+    engine: "postgresql"
+    gen:
+      go:
+        package: dao
+        out: "account/dao"
+        emit_empty_slices: true
+        output_db_file_name: "dao.go"
+        sql_package: "pgx/v5"
+        emit_interface: true
+        emit_prepared_queries: true
+
+  - schema: "./.sqlc/bill/schema.sql"
+    queries: "./.sqlc/bill/queries.sql"
+    engine: "postgresql"
+    gen:
+      go:
+        package: dao
+        out: "bill/dao"
+        emit_empty_slices: true
+        output_db_file_name: "dao.go"
+        sql_package: "pgx/v5"
+        emit_interface: true
+        emit_prepared_queries: true
+
+  - schema: "./.sqlc/category/schema.sql"
+    queries: "./.sqlc/category/queries.sql"
+    engine: "postgresql"
+    gen:
+      go:
+        package: dao
+        out: "category/dao"
+        emit_empty_slices: true
+        output_db_file_name: "dao.go"
+        sql_package: "pgx/v5"
+        emit_interface: true
+        emit_prepared_queries: true
+
   - schema: "./.sqlc/contact/schema.sql"
     queries: "./.sqlc/contact/queries.sql"
     engine: "postgresql"
@@ -10,7 +49,7 @@ sql:
         out: "contact/dao"
         emit_empty_slices: true
         output_db_file_name: "dao.go"
-        sql_package: "pgx/v4"
+        sql_package: "pgx/v5"
         emit_interface: true
         emit_prepared_queries: true
 
@@ -39,14 +78,4 @@ sql:
         sql_package: "pgx/v5"
         emit_interface: true
         emit_prepared_queries: true
-
-overrides:
-  go:
-    rename:
-      bank_id: "BankId"
-      contact_id: "ContactId"
-      id: "Id"
-      tax_id: "TaxId"
-      user_id: "UserId"
-
 

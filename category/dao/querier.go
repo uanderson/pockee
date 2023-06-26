@@ -9,7 +9,7 @@ import (
 )
 
 type Querier interface {
-	GetContacts(ctx context.Context) (Contact, error)
+	GetCategories(ctx context.Context) ([]Category, error)
 }
 
 var _ Querier = (*Queries)(nil)

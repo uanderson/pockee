@@ -6,15 +6,15 @@ package dao
 
 import ()
 
-type Setting struct {
-	ID    string
-	Key   string
-	Value string
+type Account struct {
+	ID     string
+	Name   string
+	BankID string
+	UserID string
 }
 
-type UserSetting struct {
-	ID     string
-	Key    string
-	Value  string
-	UserID string
+type Bank struct {
+	ID   string
+	Name string
+	Ispb string
 }

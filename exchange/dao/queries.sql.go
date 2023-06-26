@@ -17,7 +17,7 @@ VALUES ($1, $2, $3, $4, $5, $6)
 `
 
 type CreateExchangeRateParams struct {
-	Id        string
+	ID        string
 	Date      pgtype.Date
 	Source    string
 	Target    string
@@ -27,7 +27,7 @@ type CreateExchangeRateParams struct {
 
 func (q *Queries) CreateExchangeRate(ctx context.Context, arg CreateExchangeRateParams) error {
 	_, err := q.db.Exec(ctx, createExchangeRate,
-		arg.Id,
+		arg.ID,
 		arg.Date,
 		arg.Source,
 		arg.Target,
@@ -50,7 +50,7 @@ func (q *Queries) GetExchangeCurrencies(ctx context.Context) ([]ExchangeCurrency
 	items := []ExchangeCurrency{}
 	for rows.Next() {
 		var i ExchangeCurrency
-		if err := rows.Scan(&i.Id, &i.Source, &i.Target); err != nil {
+		if err := rows.Scan(&i.ID, &i.Source, &i.Target); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -81,7 +81,7 @@ func (q *Queries) GetExchangeRateForConversion(ctx context.Context, arg GetExcha
 	row := q.db.QueryRow(ctx, getExchangeRateForConversion, arg.CreatedAt, arg.Source, arg.Target)
 	var i ExchangeRate
 	err := row.Scan(
-		&i.Id,
+		&i.ID,
 		&i.Date,
 		&i.Source,
 		&i.Target,

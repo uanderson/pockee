@@ -9,13 +9,13 @@ import (
 )
 
 type ExchangeCurrency struct {
-	Id     string
+	ID     string
 	Source string
 	Target string
 }
 
 type ExchangeRate struct {
-	Id        string
+	ID        string
 	Date      pgtype.Date
 	Source    string
 	Target    string

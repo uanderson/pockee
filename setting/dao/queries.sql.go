@@ -16,7 +16,7 @@ SELECT id, key, value FROM settings WHERE key = $1
 func (q *Queries) GetSettingByKey(ctx context.Context, key string) (Setting, error) {
 	row := q.db.QueryRow(ctx, getSettingByKey, key)
 	var i Setting
-	err := row.Scan(&i.Id, &i.Key, &i.Value)
+	err := row.Scan(&i.ID, &i.Key, &i.Value)
 	return i, err
 }
 
@@ -26,17 +26,17 @@ SELECT id, key, value, user_id FROM user_settings WHERE key = $1 AND user_id = $
 
 type GetUserSettingByKeyParams struct {
 	Key    string
-	UserId string
+	UserID string
 }
 
 func (q *Queries) GetUserSettingByKey(ctx context.Context, arg GetUserSettingByKeyParams) (UserSetting, error) {
-	row := q.db.QueryRow(ctx, getUserSettingByKey, arg.Key, arg.UserId)
+	row := q.db.QueryRow(ctx, getUserSettingByKey, arg.Key, arg.UserID)
 	var i UserSetting
 	err := row.Scan(
-		&i.Id,
+		&i.ID,
 		&i.Key,
 		&i.Value,
-		&i.UserId,
+		&i.UserID,
 	)
 	return i, err
 }
@@ -48,18 +48,18 @@ UPDATE SET value = $3
 `
 
 type UpdateUserSettingParams struct {
-	Id     string
+	ID     string
 	Key    string
 	Value  string
-	UserId string
+	UserID string
 }
 
 func (q *Queries) UpdateUserSetting(ctx context.Context, arg UpdateUserSettingParams) error {
 	_, err := q.db.Exec(ctx, updateUserSetting,
-		arg.Id,
+		arg.ID,
 		arg.Key,
 		arg.Value,
-		arg.UserId,
+		arg.UserID,
 	)
 	return err
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gojek/heimdall/v7/httpclient"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/robfig/cron/v3"
 	"github.com/uanderson/pockee/autoid"
 	"github.com/uanderson/pockee/database"
@@ -37,6 +38,8 @@ func Schedule() Scheduler {
 	if err != nil {
 		log.Fatal("failed to query 'exchange.cron' setting")
 	}
+
+	scheduler.fetchExchangeRates()
 
 	cron := cron.New()
 	cron.AddFunc(cronSetting.Value, scheduler.fetchExchangeRates)
@@ -101,12 +104,12 @@ func fetchExchangeRate(currency dao.ExchangeCurrency) (error, float64) {
 
 func (s *Scheduler) updateExchangeRate(source string, target string, rate float64) {
 	err := s.dao.CreateExchangeRate(context.Background(), dao.CreateExchangeRateParams{
-		Date:      time.Now(),
-		Id:        autoid.Id(),
+		Date:      pgtype.Date{Time: time.Now(), Valid: true},
+		Id:        autoid.New(),
 		Rate:      rate,
 		Source:    source,
 		Target:    target,
-		CreatedAt: time.Now(),
+		CreatedAt: pgtype.Timestamp{Time: time.Now(), Valid: true},
 	})
 
 	if err != nil {

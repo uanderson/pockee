@@ -50,7 +50,7 @@ func (s *Service) UpdateUserSetting(input *UpdateSettingInput, userId string) (d
 	}
 
 	err := s.dao.UpdateUserSetting(context.Background(), dao.UpdateUserSettingParams{
-		Id:     autoid.Id(),
+		Id:     autoid.New(),
 		Key:    input.Key,
 		Value:  input.Value,
 		UserId: userId,

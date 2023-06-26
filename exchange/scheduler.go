@@ -105,7 +105,7 @@ func fetchExchangeRate(currency dao.ExchangeCurrency) (error, float64) {
 func (s *Scheduler) updateExchangeRate(source string, target string, rate float64) {
 	err := s.dao.CreateExchangeRate(context.Background(), dao.CreateExchangeRateParams{
 		Date:      pgtype.Date{Time: time.Now(), Valid: true},
-		Id:        autoid.New(),
+		ID:        autoid.New(),
 		Rate:      rate,
 		Source:    source,
 		Target:    target,

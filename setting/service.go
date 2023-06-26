@@ -36,31 +36,31 @@ func (s *Service) GetSettingByKey(key string) (dao.Setting, error) {
 }
 
 // GetUserSettingByKey returns a setting owned by the user
-func (s *Service) GetUserSettingByKey(key string, userId string) (dao.UserSetting, error) {
+func (s *Service) GetUserSettingByKey(key string, userID string) (dao.UserSetting, error) {
 	return s.dao.GetUserSettingByKey(context.Background(), dao.GetUserSettingByKeyParams{
 		Key:    key,
-		UserId: userId,
+		UserID: userID,
 	})
 }
 
 // UpdateUserSetting persists to the database the setting updates
-func (s *Service) UpdateUserSetting(input *UpdateSettingInput, userId string) (dao.UserSetting, error) {
+func (s *Service) UpdateUserSetting(input *UpdateSettingInput, userID string) (dao.UserSetting, error) {
 	if !isSettingKeyAllowed(input.Key, allowedSettingsKeys) {
 		return dao.UserSetting{}, validation.NewError(fmt.Sprintf("Key '%s' is not allowed", input.Key))
 	}
 
 	err := s.dao.UpdateUserSetting(context.Background(), dao.UpdateUserSettingParams{
-		Id:     autoid.New(),
+		ID:     autoid.New(),
 		Key:    input.Key,
 		Value:  input.Value,
-		UserId: userId,
+		UserID: userID,
 	})
 
 	if err != nil {
 		return dao.UserSetting{}, err
 	}
 
-	return s.GetUserSettingByKey(input.Key, userId)
+	return s.GetUserSettingByKey(input.Key, userID)
 }
 
 // isSettingKeyAllowed verifies if the provided key is allowed

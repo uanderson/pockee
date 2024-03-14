@@ -5,7 +5,6 @@ import (
 	"github.com/uanderson/pockee/database"
 	"github.com/uanderson/pockee/exchange"
 	"github.com/uanderson/pockee/firebase"
-	"github.com/uanderson/pockee/pocketsmith"
 	"github.com/uanderson/pockee/setting"
 	"github.com/uanderson/pockee/validation"
 	"net/http"
@@ -22,7 +21,6 @@ func main() {
 
 func schedule() {
 	exchange.Schedule()
-	pocketsmith.Schedule()
 }
 
 func serve() {

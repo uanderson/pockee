@@ -10,14 +10,14 @@ import (
 	"os"
 )
 
-// ServiceRegistry is a container for all services
-type ServiceRegistry struct {
+// ServiceContainer is a container for all services
+type ServiceContainer struct {
 	settingService *setting.Service
 }
 
 var appDatabase *database.Database
 var appFirebase *firebase.Firebase
-var appServices ServiceRegistry
+var appServices ServiceContainer
 
 func main() {
 	appFirebase = firebase.New()
@@ -29,7 +29,7 @@ func main() {
 }
 
 func initServices() {
-	appServices = ServiceRegistry{
+	appServices = ServiceContainer{
 		settingService: setting.NewService(appDatabase),
 	}
 }

@@ -2,6 +2,12 @@ package util
 
 import "context"
 
-func GetUserID(ctx context.Context) string {
-	return ctx.Value("userID").(string)
+func GetUserID(c context.Context) string {
+	value := c.Value("userID")
+
+	if value == nil {
+		return ""
+	}
+
+	return value.(string)
 }

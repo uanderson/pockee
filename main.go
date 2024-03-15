@@ -3,40 +3,53 @@ package main
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/uanderson/pockee/database"
-	"github.com/uanderson/pockee/exchange"
 	"github.com/uanderson/pockee/firebase"
-	"github.com/uanderson/pockee/pocketsmith"
 	"github.com/uanderson/pockee/setting"
 	"github.com/uanderson/pockee/validation"
 	"net/http"
 	"os"
 )
 
+// ServiceRegistry is a container for all services
+type ServiceRegistry struct {
+	settingService *setting.Service
+}
+
+var appDatabase *database.Database
+var appFirebase *firebase.Firebase
+var appServices ServiceRegistry
+
 func main() {
-	firebase.Init()
-	database.Init()
+	appFirebase = firebase.New()
+	appDatabase = database.New()
 
-	schedule()
-	serve()
+	initServices()
+	initScheduling()
+	initServer()
 }
 
-func schedule() {
-	exchange.Schedule()
-	pocketsmith.Schedule()
+func initServices() {
+	appServices = ServiceRegistry{
+		settingService: setting.NewService(appDatabase),
+	}
 }
 
-func serve() {
-	elEcho := echo.New()
-	elEcho.Validator = validation.NewEchoValidator()
+func initScheduling() {
+	// nothing scheduled yet
+}
 
-	elEcho.Use(validation.ErrorMiddleware)
+func initServer() {
+	e := echo.New()
+	e.Validator = validation.NewEchoValidator()
 
-	elEcho.GET("/status", func(c echo.Context) error {
+	e.Use(validation.ErrorMiddleware)
+
+	e.GET("/status", func(c echo.Context) error {
 		return c.String(http.StatusOK, "OK")
 	})
 
-	setting.NewApi(elEcho).Serve()
+	setting.NewApi(e, appFirebase, appServices.settingService).Serve()
 
 	address := os.Getenv("ADDRESS")
-	elEcho.Logger.Fatal(elEcho.Start(address))
+	e.Logger.Fatal(e.Start(address))
 }

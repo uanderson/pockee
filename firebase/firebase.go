@@ -10,11 +10,11 @@ import (
 	"strings"
 )
 
-// Auth client from firebase
-var Auth *auth.Client
+type Firebase struct {
+	Auth *auth.Client
+}
 
-// Initialize Firebase and its related clients
-func Init() {
+func New() *Firebase {
 	firebaseApp, err := firebase.NewApp(context.Background(), nil)
 	if err != nil {
 		log.Fatalf("error initializing Firebase: %v\n", err)
@@ -27,10 +27,12 @@ func Init() {
 
 	log.Println("firebase initialized")
 
-	Auth = firebaseAuth
+	return &Firebase{
+		Auth: firebaseAuth,
+	}
 }
 
-func Protect(handlerFunc echo.HandlerFunc, allowedRoles ...string) echo.HandlerFunc {
+func (f *Firebase) Protect(handlerFunc echo.HandlerFunc, allowedRoles ...string) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		authorization := c.Request().Header.Get("Authorization")
 
@@ -39,7 +41,7 @@ func Protect(handlerFunc echo.HandlerFunc, allowedRoles ...string) echo.HandlerF
 		}
 
 		authorization = strings.Replace(authorization, "Bearer ", "", 1)
-		token, err := Auth.VerifyIDToken(context.Background(), authorization)
+		token, err := f.Auth.VerifyIDToken(context.Background(), authorization)
 
 		if err != nil {
 			return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")

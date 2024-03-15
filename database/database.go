@@ -8,11 +8,11 @@ import (
 	"os"
 )
 
-// Pool for the database connection
-var Pool *pgxpool.Pool
+type Database struct {
+	Pool *pgxpool.Pool
+}
 
-// Init the database connection pool
-func Init() {
+func New() *Database {
 	url := fmt.Sprintf("postgres://%s:%s@%s/%s",
 		os.Getenv("DATABASE_USERNAME"),
 		os.Getenv("DATABASE_PASSWORD"),
@@ -26,5 +26,7 @@ func Init() {
 
 	log.Printf("connected to '%s' database", os.Getenv("DATABASE_NAME"))
 
-	Pool = pool
+	return &Database{
+		Pool: pool,
+	}
 }

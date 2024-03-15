@@ -1,7 +1,10 @@
 name: Test
+
 on:
-  - push
-  - pull_request
+  pull_request:
+  push:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -12,9 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     container: golang:latest
     steps:
-      - name: Get code
+      - name: Get Code
         uses: actions/checkout@v3
-      - name: Get dependencies
+      - name: Get Dependencies
         run: go mod download
       - name: Test
         run: go test -v ./...

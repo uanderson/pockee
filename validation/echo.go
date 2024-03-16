@@ -2,8 +2,7 @@ package validation
 
 import "github.com/go-playground/validator/v10"
 
-// EchoValidator is a custom validator that uses
-// go playground validator
+// EchoValidator is a custom validator that uses go playground validator
 type EchoValidator struct {
 	Validator *validator.Validate
 }

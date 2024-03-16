@@ -7,24 +7,20 @@ import (
 	"net/http"
 )
 
-// Api holds access to echo and service
 type Api struct {
 	echo     *echo.Echo
 	firebase *firebase.Firebase
 	service  *Service
 }
 
-// NewApi creates a new instance of Api
 func NewApi(echo *echo.Echo, firebase *firebase.Firebase, service *Service) *Api {
 	return &Api{echo, firebase, service}
 }
 
-// Serve hookup all the endpoints
 func (api *Api) Serve() {
 	api.echo.POST("/users.settings.update", api.firebase.Protect(api.updateSetting))
 }
 
-// updateSetting validates and delegate the update of the user setting to the service
 func (api *Api) updateSetting(c echo.Context) (err error) {
 	var input UpdateSettingInput
 	if err = c.Bind(&input); err != nil {

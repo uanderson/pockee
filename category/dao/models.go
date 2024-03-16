@@ -4,12 +4,11 @@
 
 package dao
 
-import (
-	"github.com/jackc/pgx/v5/pgtype"
-)
+import ()
 
 type Category struct {
 	ID       string
 	Name     string
-	ParentID pgtype.Text
+	ParentID *string
+	UserID   string
 }

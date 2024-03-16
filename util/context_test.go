@@ -6,16 +6,18 @@ import (
 	"testing"
 )
 
-func TestGetUserID(t *testing.T) {
+func TestPresentUserID(t *testing.T) {
 	ctx := context.WithValue(context.Background(), "userID", "foo")
-	userID := GetUserID(ctx)
+	userID, err := GetUserID(ctx)
 
+	assert.NoError(t, err)
 	assert.Equal(t, "foo", userID)
 }
 
-func Test(t *testing.T) {
+func TestMissingUserID(t *testing.T) {
 	ctx := context.Background()
-	userID := GetUserID(ctx)
+	userID, err := GetUserID(ctx)
 
-	assert.Equal(t, userID, "")
+	assert.Error(t, err)
+	assert.Equal(t, "", userID)
 }

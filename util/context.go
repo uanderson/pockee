@@ -1,13 +1,16 @@
 package util
 
-import "context"
+import (
+	"context"
+	"errors"
+)
 
-func GetUserID(c context.Context) string {
+func GetUserID(c context.Context) (string, error) {
 	value := c.Value("userID")
 
 	if value == nil {
-		return ""
+		return "", errors.New("userID not found in context")
 	}
 
-	return value.(string)
+	return value.(string), nil
 }

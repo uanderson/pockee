@@ -13,6 +13,7 @@ sql:
         sql_package: "pgx/v5"
         emit_interface: true
         emit_prepared_queries: true
+        emit_pointers_for_null_types: true
 
   - schema: "./.sqlc/bill/schema.sql"
     queries: "./.sqlc/bill/queries.sql"
@@ -26,6 +27,7 @@ sql:
         sql_package: "pgx/v5"
         emit_interface: true
         emit_prepared_queries: true
+        emit_pointers_for_null_types: true
 
   - schema: "./.sqlc/category/schema.sql"
     queries: "./.sqlc/category/queries.sql"
@@ -39,6 +41,7 @@ sql:
         sql_package: "pgx/v5"
         emit_interface: true
         emit_prepared_queries: true
+        emit_pointers_for_null_types: true
 
   - schema: "./.sqlc/contact/schema.sql"
     queries: "./.sqlc/contact/queries.sql"
@@ -52,6 +55,7 @@ sql:
         sql_package: "pgx/v5"
         emit_interface: true
         emit_prepared_queries: true
+        emit_pointers_for_null_types: true
 
   - schema: "./.sqlc/exchange/schema.sql"
     queries: "./.sqlc/exchange/queries.sql"
@@ -65,6 +69,7 @@ sql:
         sql_package: "pgx/v5"
         emit_interface: true
         emit_prepared_queries: true
+        emit_pointers_for_null_types: true
 
   - schema: "./.sqlc/setting/schema.sql"
     queries: "./.sqlc/setting/queries.sql"
@@ -78,4 +83,5 @@ sql:
         sql_package: "pgx/v5"
         emit_interface: true
         emit_prepared_queries: true
+        emit_pointers_for_null_types: true
 

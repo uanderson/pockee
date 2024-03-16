@@ -2,6 +2,10 @@ package main
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/uanderson/pockee/account"
+	"github.com/uanderson/pockee/bill"
+	"github.com/uanderson/pockee/category"
+	"github.com/uanderson/pockee/contact"
 	"github.com/uanderson/pockee/database"
 	"github.com/uanderson/pockee/firebase"
 	"github.com/uanderson/pockee/setting"
@@ -10,9 +14,12 @@ import (
 	"os"
 )
 
-// ServiceContainer is a container for all services
 type ServiceContainer struct {
-	settingService *setting.Service
+	accountService  *account.Service
+	billService     *bill.Service
+	categoryService *category.Service
+	contactService  *contact.Service
+	settingService  *setting.Service
 }
 
 var appDatabase *database.Database
@@ -30,7 +37,11 @@ func main() {
 
 func initServices() {
 	appServices = ServiceContainer{
-		settingService: setting.NewService(appDatabase),
+		accountService:  account.NewService(appDatabase),
+		billService:     bill.NewService(appDatabase),
+		categoryService: category.NewService(appDatabase),
+		contactService:  contact.NewService(appDatabase),
+		settingService:  setting.NewService(appDatabase),
 	}
 }
 
@@ -41,13 +52,16 @@ func initScheduling() {
 func initServer() {
 	e := echo.New()
 	e.Validator = validation.NewEchoValidator()
-
 	e.Use(validation.ErrorMiddleware)
 
 	e.GET("/status", func(c echo.Context) error {
 		return c.String(http.StatusOK, "OK")
 	})
 
+	account.NewApi(e, appFirebase, appServices.accountService).Serve()
+	bill.NewApi(e, appFirebase, appServices.billService).Serve()
+	category.NewApi(e, appFirebase, appServices.categoryService).Serve()
+	contact.NewApi(e, appFirebase, appServices.contactService).Serve()
 	setting.NewApi(e, appFirebase, appServices.settingService).Serve()
 
 	address := os.Getenv("ADDRESS")

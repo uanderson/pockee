@@ -7,5 +7,6 @@ import (
 
 func EchoContext(c echo.Context) context.Context {
 	userID := c.Get("uid").(string)
+
 	return context.WithValue(c.Request().Context(), "userID", userID)
 }

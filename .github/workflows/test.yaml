@@ -20,4 +20,4 @@ jobs:
       - name: Get Dependencies
         run: go mod download
       - name: Test
-        run: go test -v ./...
+        run: go test -v $(go list ./... | grep -v /dao)

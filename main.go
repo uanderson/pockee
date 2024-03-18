@@ -7,9 +7,9 @@ import (
 	"github.com/uanderson/pockee/category"
 	"github.com/uanderson/pockee/contact"
 	"github.com/uanderson/pockee/database"
+	"github.com/uanderson/pockee/echox"
 	"github.com/uanderson/pockee/firebase"
 	"github.com/uanderson/pockee/setting"
-	"github.com/uanderson/pockee/validation"
 	"net/http"
 	"os"
 )
@@ -51,11 +51,11 @@ func initScheduling() {
 
 func initServer() {
 	e := echo.New()
-	e.Validator = validation.NewEchoValidator()
-	e.Use(validation.ErrorMiddleware)
+	e.Validator = echox.NewEchoValidator()
+	e.Use(echox.ErrorMiddleware)
 
-	e.GET("/status", func(c echo.Context) error {
-		return c.String(http.StatusOK, "OK")
+	e.GET("/status", func(ctx echo.Context) error {
+		return ctx.String(http.StatusOK, "OK")
 	})
 
 	account.NewApi(e, appFirebase, appServices.accountService).Serve()

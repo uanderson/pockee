@@ -9,29 +9,48 @@ import (
 	"context"
 )
 
-const getSettingByKey = `-- name: GetSettingByKey :one
-SELECT id, key, value FROM settings WHERE key = $1
+const deleteSettingByKey = `-- name: DeleteSettingByKey :exec
+DELETE FROM settings WHERE key = $1 AND user_id = $2
 `
 
-func (q *Queries) GetSettingByKey(ctx context.Context, key string) (Setting, error) {
-	row := q.db.QueryRow(ctx, getSettingByKey, key)
-	var i Setting
-	err := row.Scan(&i.ID, &i.Key, &i.Value)
-	return i, err
-}
-
-const getUserSettingByKey = `-- name: GetUserSettingByKey :one
-SELECT id, key, value, user_id FROM user_settings WHERE key = $1 AND user_id = $2
-`
-
-type GetUserSettingByKeyParams struct {
+type DeleteSettingByKeyParams struct {
 	Key    string
 	UserID string
 }
 
-func (q *Queries) GetUserSettingByKey(ctx context.Context, arg GetUserSettingByKeyParams) (UserSetting, error) {
-	row := q.db.QueryRow(ctx, getUserSettingByKey, arg.Key, arg.UserID)
-	var i UserSetting
+func (q *Queries) DeleteSettingByKey(ctx context.Context, arg DeleteSettingByKeyParams) error {
+	_, err := q.db.Exec(ctx, deleteSettingByKey, arg.Key, arg.UserID)
+	return err
+}
+
+const existsSettingByKey = `-- name: ExistsSettingByKey :one
+SELECT EXISTS (SELECT 1 FROM settings WHERE key = $1 AND user_id = $2)
+`
+
+type ExistsSettingByKeyParams struct {
+	Key    string
+	UserID string
+}
+
+func (q *Queries) ExistsSettingByKey(ctx context.Context, arg ExistsSettingByKeyParams) (bool, error) {
+	row := q.db.QueryRow(ctx, existsSettingByKey, arg.Key, arg.UserID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
+const getSettingByKey = `-- name: GetSettingByKey :one
+SELECT id, key, value, user_id FROM settings WHERE key = $1 AND user_id = $2
+`
+
+type GetSettingByKeyParams struct {
+	Key    string
+	UserID string
+}
+
+func (q *Queries) GetSettingByKey(ctx context.Context, arg GetSettingByKeyParams) (Setting, error) {
+	row := q.db.QueryRow(ctx, getSettingByKey, arg.Key, arg.UserID)
+	var i Setting
 	err := row.Scan(
 		&i.ID,
 		&i.Key,
@@ -41,21 +60,20 @@ func (q *Queries) GetUserSettingByKey(ctx context.Context, arg GetUserSettingByK
 	return i, err
 }
 
-const updateUserSetting = `-- name: UpdateUserSetting :exec
-INSERT INTO user_settings (id, key, value, user_id)
-VALUES ($1, $2, $3, $4) ON CONFLICT (key, user_id) DO
-UPDATE SET value = $3
+const updateSetting = `-- name: UpdateSetting :exec
+INSERT INTO settings (id, key, value, user_id) VALUES ($1, $2, $3, $4)
+ON CONFLICT (key, user_id) DO UPDATE SET value = $3
 `
 
-type UpdateUserSettingParams struct {
+type UpdateSettingParams struct {
 	ID     string
 	Key    string
 	Value  string
 	UserID string
 }
 
-func (q *Queries) UpdateUserSetting(ctx context.Context, arg UpdateUserSettingParams) error {
-	_, err := q.db.Exec(ctx, updateUserSetting,
+func (q *Queries) UpdateSetting(ctx context.Context, arg UpdateSettingParams) error {
+	_, err := q.db.Exec(ctx, updateSetting,
 		arg.ID,
 		arg.Key,
 		arg.Value,

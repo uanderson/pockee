@@ -7,12 +7,6 @@ package dao
 import ()
 
 type Setting struct {
-	ID    string
-	Key   string
-	Value string
-}
-
-type UserSetting struct {
 	ID     string
 	Key    string
 	Value  string

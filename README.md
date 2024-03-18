@@ -1,5 +1,7 @@
 # Pockee
 
-Pockee is a pet project that allows me to know more about GoLang. Its main goal is to integrate with the personal finance app [PocketSmith](https://pocketsmith.com) and automate things that I normally do manually.
+Pockee is a streamlined financial project designed to leverage open finance APIs from banks to automate payments of recurring expenses, specifically.
 
-I will improve this readme as I go :)
+## Web API
+
+Inspired by Slack Web API.

@@ -2,8 +2,8 @@ package setting
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/uanderson/pockee/echox"
 	"github.com/uanderson/pockee/firebase"
-	"github.com/uanderson/pockee/util"
 	"net/http"
 )
 
@@ -18,23 +18,38 @@ func NewApi(echo *echo.Echo, firebase *firebase.Firebase, service *Service) *Api
 }
 
 func (api *Api) Serve() {
-	api.echo.POST("/users.settings.update", api.firebase.Protect(api.updateSetting))
+	api.echo.POST("/settings.delete", api.firebase.Protect(api.deleteSetting))
+	api.echo.POST("/settings.update", api.firebase.Protect(api.updateSetting))
 }
 
-func (api *Api) updateSetting(c echo.Context) (err error) {
-	var input UpdateSettingInput
-	if err = c.Bind(&input); err != nil {
-		return c.String(http.StatusBadRequest, "Invalid request body")
-	}
+func (api *Api) deleteSetting(ctx echo.Context) error {
+	var input DeleteSettingInput
 
-	if err = c.Validate(&input); err != nil {
-		return
-	}
-
-	setting, err := api.service.UpdateUserSetting(util.EchoContext(c), &input)
+	err := echox.BindAndValidate(ctx, &input)
 	if err != nil {
-		return
+		return err
 	}
 
-	return c.JSON(http.StatusOK, setting)
+	err = api.service.DeleteSetting(echox.RequestContext(ctx), input)
+	if err != nil {
+		return err
+	}
+
+	return ctx.NoContent(http.StatusNoContent)
+}
+
+func (api *Api) updateSetting(ctx echo.Context) error {
+	var input UpdateSettingInput
+
+	err := echox.BindAndValidate(ctx, &input)
+	if err != nil {
+		return err
+	}
+
+	err = api.service.UpdateUserSetting(echox.RequestContext(ctx), input)
+	if err != nil {
+		return err
+	}
+
+	return ctx.NoContent(http.StatusNoContent)
 }

@@ -2,12 +2,11 @@ package setting
 
 import (
 	"context"
-	"fmt"
 	"github.com/uanderson/pockee/autoid"
 	"github.com/uanderson/pockee/database"
+	"github.com/uanderson/pockee/echox"
+	"github.com/uanderson/pockee/errorsx"
 	"github.com/uanderson/pockee/setting/dao"
-	"github.com/uanderson/pockee/util"
-	"github.com/uanderson/pockee/validation"
 )
 
 type Service struct {
@@ -18,41 +17,40 @@ func NewService(database *database.Database) *Service {
 	return &Service{dao: dao.New(database.Pool)}
 }
 
-func (s *Service) GetSettingByKey(ctx context.Context, key string) (dao.Setting, error) {
-	return s.dao.GetSettingByKey(ctx, key)
-}
-
-func (s *Service) GetUserSettingByKey(ctx context.Context, key string) (dao.UserSetting, error) {
-	userID := ctx.Value("userID").(string)
-
-	return s.dao.GetUserSettingByKey(context.Background(), dao.GetUserSettingByKeyParams{
+func (s *Service) ExistsSettingByKey(ctx context.Context, key string) (bool, error) {
+	return s.dao.ExistsSettingByKey(ctx, dao.ExistsSettingByKeyParams{
 		Key:    key,
-		UserID: userID,
+		UserID: echox.GetUserID(ctx),
 	})
 }
 
-func (s *Service) UpdateUserSetting(ctx context.Context, input *UpdateSettingInput) (dao.UserSetting, error) {
-	if !isSettingKeyAllowed(input.Key) {
-		return dao.UserSetting{}, validation.NewError(fmt.Sprintf("Key '%s' is not allowed", input.Key))
-	}
-
-	userID, err := util.GetUserID(ctx)
+func (s *Service) DeleteSetting(ctx context.Context, input DeleteSettingInput) error {
+	exists, err := s.ExistsSettingByKey(ctx, input.Key)
 	if err != nil {
-		return dao.UserSetting{}, err
+		return err
 	}
 
-	err = s.dao.UpdateUserSetting(ctx, dao.UpdateUserSettingParams{
+	if !exists {
+		return errorsx.SettingNotFound
+	}
+
+	return s.dao.DeleteSettingByKey(ctx, dao.DeleteSettingByKeyParams{
+		Key:    input.Key,
+		UserID: echox.GetUserID(ctx),
+	})
+}
+
+func (s *Service) UpdateUserSetting(ctx context.Context, input UpdateSettingInput) error {
+	if !isSettingKeyAllowed(input.Key) {
+		return errorsx.SettingNotFound
+	}
+
+	return s.dao.UpdateSetting(ctx, dao.UpdateSettingParams{
 		ID:     autoid.New(),
 		Key:    input.Key,
 		Value:  input.Value,
-		UserID: userID,
+		UserID: echox.GetUserID(ctx),
 	})
-
-	if err != nil {
-		return dao.UserSetting{}, err
-	}
-
-	return s.GetUserSettingByKey(ctx, input.Key)
 }
 
 func isSettingKeyAllowed(key string) bool {

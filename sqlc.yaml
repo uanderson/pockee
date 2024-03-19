@@ -1,34 +1,6 @@
 version: 2
 
 sql:
-  - schema: "./.sqlc/account/schema.sql"
-    queries: "./.sqlc/account/queries.sql"
-    engine: "postgresql"
-    gen:
-      go:
-        package: dao
-        out: "account/dao"
-        emit_empty_slices: true
-        output_db_file_name: "dao.go"
-        sql_package: "pgx/v5"
-        emit_interface: true
-        emit_prepared_queries: true
-        emit_pointers_for_null_types: true
-
-  - schema: "./.sqlc/bill/schema.sql"
-    queries: "./.sqlc/bill/queries.sql"
-    engine: "postgresql"
-    gen:
-      go:
-        package: dao
-        out: "bill/dao"
-        emit_empty_slices: true
-        output_db_file_name: "dao.go"
-        sql_package: "pgx/v5"
-        emit_interface: true
-        emit_prepared_queries: true
-        emit_pointers_for_null_types: true
-
   - schema: "./.sqlc/category/schema.sql"
     queries: "./.sqlc/category/queries.sql"
     engine: "postgresql"
@@ -36,34 +8,6 @@ sql:
       go:
         package: dao
         out: "category/dao"
-        emit_empty_slices: true
-        output_db_file_name: "dao.go"
-        sql_package: "pgx/v5"
-        emit_interface: true
-        emit_prepared_queries: true
-        emit_pointers_for_null_types: true
-
-  - schema: "./.sqlc/contact/schema.sql"
-    queries: "./.sqlc/contact/queries.sql"
-    engine: "postgresql"
-    gen:
-      go:
-        package: dao
-        out: "contact/dao"
-        emit_empty_slices: true
-        output_db_file_name: "dao.go"
-        sql_package: "pgx/v5"
-        emit_interface: true
-        emit_prepared_queries: true
-        emit_pointers_for_null_types: true
-
-  - schema: "./.sqlc/exchange/schema.sql"
-    queries: "./.sqlc/exchange/queries.sql"
-    engine: "postgresql"
-    gen:
-      go:
-        package: dao
-        out: "exchange/dao"
         emit_empty_slices: true
         output_db_file_name: "dao.go"
         sql_package: "pgx/v5"

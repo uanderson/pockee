@@ -2,10 +2,7 @@ package main
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/uanderson/pockee/account"
-	"github.com/uanderson/pockee/bill"
 	"github.com/uanderson/pockee/category"
-	"github.com/uanderson/pockee/contact"
 	"github.com/uanderson/pockee/database"
 	"github.com/uanderson/pockee/echox"
 	"github.com/uanderson/pockee/firebase"
@@ -15,10 +12,7 @@ import (
 )
 
 type ServiceContainer struct {
-	accountService  *account.Service
-	billService     *bill.Service
 	categoryService *category.Service
-	contactService  *contact.Service
 	settingService  *setting.Service
 }
 
@@ -37,10 +31,7 @@ func main() {
 
 func initServices() {
 	appServices = ServiceContainer{
-		accountService:  account.NewService(appDatabase),
-		billService:     bill.NewService(appDatabase),
 		categoryService: category.NewService(appDatabase),
-		contactService:  contact.NewService(appDatabase),
 		settingService:  setting.NewService(appDatabase),
 	}
 }
@@ -58,10 +49,7 @@ func initServer() {
 		return ctx.String(http.StatusOK, "OK")
 	})
 
-	account.NewApi(e, appFirebase, appServices.accountService).Serve()
-	bill.NewApi(e, appFirebase, appServices.billService).Serve()
 	category.NewApi(e, appFirebase, appServices.categoryService).Serve()
-	contact.NewApi(e, appFirebase, appServices.contactService).Serve()
 	setting.NewApi(e, appFirebase, appServices.settingService).Serve()
 
 	address := os.Getenv("ADDRESS")

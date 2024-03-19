@@ -1,9 +1,6 @@
 -- name: GetCategories :many
 SELECT * FROM categories WHERE user_id = @user_id;
 
--- name: GetCategoryByID :one
-SELECT * FROM categories WHERE id = @id AND user_id = @user_id;
-
 -- name: ExistsCategoryByID :one
 SELECT EXISTS(SELECT 1 FROM categories WHERE id = @id AND user_id = @user_id);
 

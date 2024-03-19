@@ -11,6 +11,9 @@ var InvalidInputData = errors.New("error::invalidInputData")
 var MissingAuthorizationToken = errors.New("error::missingAuthorizationToken")
 var UnauthorizedAccess = errors.New("error::unauthorizedAccess")
 
+// Category errors
+var CategoryNotFound = errors.New("error::categoryNotFound")
+
 // Settings errors
 var SettingNotFound = errors.New("error::settingNotFound")
 

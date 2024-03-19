@@ -13,7 +13,6 @@ type Querier interface {
 	DeleteCategory(ctx context.Context, arg DeleteCategoryParams) error
 	ExistsCategoryByID(ctx context.Context, arg ExistsCategoryByIDParams) (bool, error)
 	GetCategories(ctx context.Context, userID string) ([]Category, error)
-	GetCategoryByID(ctx context.Context, arg GetCategoryByIDParams) (Category, error)
 	UpdateCategory(ctx context.Context, arg UpdateCategoryParams) error
 }
 
